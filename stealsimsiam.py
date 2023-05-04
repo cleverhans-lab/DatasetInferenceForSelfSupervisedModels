@@ -23,7 +23,7 @@ import torchvision.models as models
 import torchvision.transforms as transforms
 import warnings
 from torch.utils.data import DataLoader
-from loss import soft_nn_loss_imagenet, pairwise_euclid_distance
+from loss import soft_nn_loss, pairwise_euclid_distance
 from data_aug.gaussian_blur import GaussianBlur
 
 from models.resnet_simclr import ResNetSimCLRV2
@@ -299,7 +299,7 @@ def main_worker(gpu, ngpus_per_node, args):
     elif args.losstype == "infonce":
         criterion = nn.CrossEntropyLoss().cuda(args.gpu)
     elif args.losstype == "softnn":
-        criterion = soft_nn_loss_imagenet
+        criterion = soft_nn_loss
 
     optimizer = torch.optim.SGD(model.parameters(), init_lr,
                                 momentum=args.momentum,
@@ -658,7 +658,6 @@ def save_checkpoint(state, is_best, args):
     if is_best:
         torch.save(state,
                    f"{pathpre}/SimCLR/SimSiam/checkpoint_{args.datasetsteal}_{args.losstype}_{args.num_queries}.pth.tar")
-
 
 
 def sanity_check(state_dict, pretrained_weights):
